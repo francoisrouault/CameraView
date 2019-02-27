@@ -1,10 +1,14 @@
 package com.cocoricostudio.cameraview;
 
 import android.hardware.Camera;
+import android.util.Log;
 
 import java.util.List;
+import java.util.Locale;
 
 class CameraUtils {
+
+    private static final String TAG = CameraUtils.class.getSimpleName();
 
     static Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.1;
@@ -37,6 +41,17 @@ class CameraUtils {
             }
         }
         return optimalSize;
+    }
+
+    static void logSizes(String message, List<Camera.Size> sizes) {
+        Log.v(TAG, message);
+        for (Camera.Size size : sizes) {
+            Log.v(TAG, "- " + size.width + "x" + size.height + ", r: " + logRatio(size.width, size.height));
+        }
+    }
+
+    public static String logRatio(int width, int height) {
+        return String.format(Locale.US, "%.2f", (double) width / height);
     }
 
 }

@@ -27,6 +27,7 @@ class CameraView extends ViewGroup implements SurfaceHolder.Callback {
 
     CameraView(Context context) {
         super(context);
+        Log.v(TAG, "init");
 
         mSurfaceView = new SurfaceView(context);
         addView(mSurfaceView);
@@ -39,14 +40,17 @@ class CameraView extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     public void setCamera(Camera camera) {
+        Log.v(TAG, "Set camera: " + camera);
         mCamera = camera;
         if (mCamera != null) {
             mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
+            CameraUtils.logSizes("Supported Preview Sizes:", mSupportedPreviewSizes);
             requestLayout();
         }
     }
 
     public void switchCamera(Camera camera) {
+        Log.v(TAG, "Switch camera.");
         setCamera(camera);
         try {
             camera.setPreviewDisplay(mHolder);
@@ -71,16 +75,18 @@ class CameraView extends ViewGroup implements SurfaceHolder.Callback {
 
         if (mSupportedPreviewSizes != null) {
             mPreviewSize = CameraUtils.getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
+            Log.v(TAG, "onMeasure " + width + "x" + height + ". Preview Size : " + mPreviewSize.width + "x" + mPreviewSize.height);
         }
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        final int width = r - l;
+        final int height = b - t;
+        Log.v(TAG, "onLayout changed: " + changed + ", size: " + width + "x" + height);
+
         if (changed && getChildCount() > 0) {
             final View child = getChildAt(0);
-
-            final int width = r - l;
-            final int height = b - t;
 
             int previewWidth = width;
             int previewHeight = height;
@@ -103,6 +109,7 @@ class CameraView extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
+        Log.v(TAG, "surfaceCreated.");
         // The Surface has been created, acquire the camera and tell it where
         // to draw.
         try {
@@ -115,6 +122,7 @@ class CameraView extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
+        Log.v(TAG, "surfaceDestroyed.");
         // Surface will be destroyed when we return, so stop the preview.
         if (mCamera != null) {
             mCamera.stopPreview();
@@ -122,6 +130,8 @@ class CameraView extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+        Log.v(TAG, "surfaceChanged.");
+
         // Now that the size is known, set up the camera parameters and begin
         // the preview.
         Camera.Parameters parameters = mCamera.getParameters();
