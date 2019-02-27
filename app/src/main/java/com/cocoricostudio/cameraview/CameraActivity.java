@@ -1,16 +1,25 @@
 package com.cocoricostudio.cameraview;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 public class CameraActivity extends AppCompatActivity {
+    private static final String TAG = CameraActivity.class.getSimpleName();
     private CameraView mPreview;
     Camera mCamera;
     int numberOfCameras;
@@ -25,6 +34,15 @@ public class CameraActivity extends AppCompatActivity {
 
         // Hide the window title.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+            Log.e(TAG, getString(R.string.camera_permission_needed));
+            Toast.makeText(this, R.string.camera_permission_needed, Toast.LENGTH_SHORT).show();
+            Intent appSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+            startActivity(appSettings);
+            finish();
+            return;
+        }
 
         // Create a RelativeLayout container that will hold a SurfaceView,
         // and set it as the content of our activity.
